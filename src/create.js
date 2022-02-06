@@ -85,7 +85,11 @@ export default function Create() {
         })
       );
     }
-    setNewItemLevels([]);
+    if (createOrEdit === "create") {
+      setNewItemLevels([]);
+    } else {
+      setItemLevelCopy(newItemLevels);
+    }
     setIsSaved(true);
     planNameRef.current.value = "";
   };
