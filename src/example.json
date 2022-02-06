@@ -1,0 +1,77 @@
+[
+  {
+    "name": "example",
+    "levels": [
+      {
+        "tiers": [
+          {
+            "from": 1,
+            "rate": 20
+          },
+          {
+            "from": 10,
+            "rate": 25
+          }
+        ]
+      },
+      {
+        "tiers": [
+          {
+            "from": 3,
+            "rate": 18
+          },
+          {
+            "from": 23,
+            "rate": 20
+          }
+        ]
+      },
+      {
+        "tiers": [
+          {
+            "from": 2,
+            "rate": 18
+          },
+          {
+            "from": 234,
+            "rate": 22
+          },
+          {
+            "from": 443,
+            "rate": 25
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "example2",
+    "levels": [
+      {
+        "tiers": [
+          {
+            "from": 2,
+            "rate": 20
+          },
+          {
+            "from": 10,
+            "rate": 25
+          }
+        ]
+      },
+      {
+        "tiers": [
+          {
+            "from": 45,
+            "rate": 18
+          },
+          {
+            "from": 321,
+            "rate": 20
+          }
+        ]
+      }
+    ]
+  }
+]
