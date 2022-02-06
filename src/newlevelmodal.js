@@ -36,9 +36,9 @@ export default function CreateModal({ setIsModalOpen, level }) {
       if (
         Object.values(refsArr?.[i])
           .map(ref => ref.value)
-          .some(el => el < 0)
+          .some(el => el <= 0)
       ) {
-        setAlert("All values must be greater or equal to 0!");
+        setAlert("All values must be greater than 0!");
         return;
       }
 
