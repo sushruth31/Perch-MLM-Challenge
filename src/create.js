@@ -66,7 +66,7 @@ export default function Create() {
         setAlert("No plan name!");
         return;
       }
-      if (plans.some(({ name }) => name === planNameVal)) {
+      if (plans.some(({ name }) => name.toLowerCase().trim() === planNameVal.toLowerCase().trim())) {
         setAlert("Plan name already exists!");
         return;
       }
