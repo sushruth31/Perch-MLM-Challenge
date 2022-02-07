@@ -78,7 +78,7 @@ export default function CreateModal({ setIsModalOpen, level }) {
             preventSubmit = true;
             return prevState;
           }
-          return prevState.map((el, idx) => (idx === levelIdx ? { tiers: editedLevelTiers } : el));
+          return newState;
         });
         //should handle the case when user is editing levels, removes a tier then saves. a bit hacky but does the job
       } catch (err) {
@@ -96,12 +96,18 @@ export default function CreateModal({ setIsModalOpen, level }) {
 
   function TierForm({ from, rate, i, isFromMap }) {
     const [tempTier, setTempTier] = useState(tempTiers.find((_, idx) => idx === i));
+    const [localAlert, setLocalAlert] = useState(null);
 
     const handleChange = ({ target }) => {
       setTempTier(prevState => ({
         ...prevState,
         [target.name]: Number(target.value),
       }));
+    };
+
+    const sendError = mssg => {
+      setTempTier(tempTier);
+      setLocalAlert(mssg);
     };
 
     return (
@@ -164,14 +170,15 @@ export default function CreateModal({ setIsModalOpen, level }) {
                     return true;
                   })
                 ) {
-                  setAlert("Invalid Values - Please Try again");
+                  //set state so we dont lose values
+                  sendError("Invalid Values - Please Try again");
                   return;
                 }
                 //also check if from value is larger than previous tier
                 const prevTierFromVal = [...tempTiers].pop()?.from;
                 if (tempTier?.from <= prevTierFromVal) {
                   {
-                    setAlert("From value must be higher than previous tier");
+                    sendError("From value must be higher than previous tier");
                     return;
                   }
                 }
@@ -182,9 +189,14 @@ export default function CreateModal({ setIsModalOpen, level }) {
               className="btn btn-primary my-[20px]">
               Add
             </button>
-            {alert && (
+            {alert && isFromMap && (
               <Alert ref={alertRef} className="mb-[20px]" severity="error">
                 {alert}
+              </Alert>
+            )}
+            {localAlert && !isFromMap && (
+              <Alert className="mb-[20px]" severity="error">
+                {localAlert}
               </Alert>
             )}
           </>
