@@ -19,6 +19,14 @@ export default function CreateModal({ setIsModalOpen, level }) {
 
   const tierRefs = useRef([]);
 
+  const error = mssg => {
+    //add the refs array to the state so we dont lose it
+    const refsArr = tierRefs.current;
+    setTempTiers(refsArr.map(obj => ({ from: obj?.from?.value, rate: obj?.rate?.value })));
+
+    setAlert(mssg);
+  };
+
   useEffect(() => {
     if (alert) setAlert(false);
   }, [isTierBeingAdded]);
@@ -33,12 +41,14 @@ export default function CreateModal({ setIsModalOpen, level }) {
 
     for (let i = 0; i < refsArr.length; i++) {
       //check to make sure all values are positive
+      //check if all rate values are between 1 and 100
+
       if (
-        Object.values(refsArr?.[i])
-          .map(ref => ref.value)
-          .some(el => el <= 0)
+        Object.values(refsArr)
+          .map(obj => ({ from: obj?.from?.value, rate: obj?.rate?.value }))
+          .some(({ from, rate }) => Number(from) <= 0 || Number(rate) > 100)
       ) {
-        setAlert("All values must be greater than 0!");
+        error("Values must be within appropriate range");
         return;
       }
 
@@ -46,19 +56,20 @@ export default function CreateModal({ setIsModalOpen, level }) {
       const val1 = Number(refsArr?.[i]?.from?.value);
       const val2 = Number(refsArr?.[i + 1]?.from?.value);
       if (val1 > 0 && val2 > 0 && val1 >= val2) {
-        setAlert("Invalid Setup! - Please Try Again");
+        error("Invalid Setup! - Please Try Again");
         return;
       }
     }
 
+    const editedLevelTiers = refsArr.map(el => ({
+      from: Number(el?.from?.value),
+      rate: Number(el?.rate?.value),
+    }));
+
     if (editOrCreate === "create") {
-      setNewItemLevels(prevState => [...prevState, { tiers: tempTiers }]);
+      setNewItemLevels(prevState => [...prevState, { tiers: editedLevelTiers }]);
     } else {
       try {
-        const editedLevelTiers = refsArr.map(el => ({
-          from: Number(el.from.value),
-          rate: Number(el.rate.value),
-        }));
         setNewItemLevels(prevState => {
           const newState = prevState.map((el, idx) => (idx === levelIdx ? { tiers: editedLevelTiers } : el));
 
@@ -71,13 +82,13 @@ export default function CreateModal({ setIsModalOpen, level }) {
         });
         //should handle the case when user is editing levels, removes a tier then saves. a bit hacky but does the job
       } catch (err) {
-        console.log(err);
+        //console.log(err);
         setNewItemLevels(prevState => prevState.map((el, i) => (i === levelIdx ? { tiers: tempTiers } : el)));
       }
     }
 
     if (preventSubmit) {
-      setAlert("You must make an edit to save!");
+      error("You must make an edit to save!");
       return;
     }
     setIsModalOpen(false);
