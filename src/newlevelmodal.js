@@ -61,34 +61,32 @@ export default function CreateModal({ setIsModalOpen, level }) {
       }
     }
 
-    const editedLevelTiers = refsArr.map(el => ({
-      from: Number(el?.from?.value),
-      rate: Number(el?.rate?.value),
-    }));
+    const editedLevelTiers = refsArr
+      .map(el => ({
+        from: Number(el?.from?.value),
+        rate: Number(el?.rate?.value),
+      }))
+      .filter(el => Object.values(el).every(val => Number(val) > 0));
 
     if (editOrCreate === "create") {
       setNewItemLevels(prevState => [...prevState, { tiers: editedLevelTiers }]);
     } else {
-      try {
-        setNewItemLevels(prevState => {
-          const newState = prevState.map((el, idx) => (idx === levelIdx ? { tiers: editedLevelTiers } : el));
+      setNewItemLevels(prevState => {
+        const newState = prevState.map((el, idx) => (idx === levelIdx ? { tiers: editedLevelTiers } : el));
 
-          //check if any edits were made with deep recursive object compare function
-          if (areObjectsEqual(prevState, newState)) {
-            preventSubmit = true;
-            return prevState;
-          }
-          return newState;
-        });
-        //should handle the case when user is editing levels, removes a tier then saves. a bit hacky but does the job
-      } catch (err) {
-        //console.log(err);
-        setNewItemLevels(prevState => prevState.map((el, i) => (i === levelIdx ? { tiers: tempTiers } : el)));
-      }
+        //check if any edits were made with deep recursive object compare function
+        if (areObjectsEqual(prevState, newState)) {
+          preventSubmit = true;
+          return prevState;
+        }
+        return newState;
+      });
+      //should handle the case when user is editing levels, removes a tier then saves. a bit hacky but does the job
     }
 
     if (preventSubmit) {
       error("You must make an edit to save!");
+      setTempTiers(editedLevelTiers);
       return;
     }
     setIsModalOpen(false);
@@ -110,16 +108,23 @@ export default function CreateModal({ setIsModalOpen, level }) {
       setLocalAlert(mssg);
     };
 
+    const handleDelete = () => {
+      //update our refs array when this delete is made
+
+      const refsArr = tierRefs.current
+        .map(({ from, rate }) => ({ rate: Number(rate?.value), from: Number(from?.value) }))
+        .filter((_, idx) => idx !== i);
+
+      tierRefs.current = tierRefs.current.filter((_, idx) => idx !== i);
+
+      setTempTiers(refsArr);
+    };
+
     return (
       <div className="flex flex-col items-center mt-[20px]">
         <div className="flex justify-end items-center">
           <div className="font-bold">{i === undefined ? `New Tier: ${tempTiers.length + 1}` : `Tier ${i + 1}`}</div>
-          {isFromMap && (
-            <MdClose
-              onClick={() => setTempTiers(prevState => prevState.filter((_, idx) => idx !== i))}
-              className="ml-[80px] text-2xl cursor-pointer"
-            />
-          )}
+          {isFromMap && <MdClose onClick={handleDelete} className="ml-[80px] text-2xl cursor-pointer" />}
         </div>
         <div className="flex items-center mb-[20px] mt-[20px]">
           <div className="mb-[20px] mr-[5px]">$</div>

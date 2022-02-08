@@ -12,7 +12,7 @@ function AppLoading() {
   return (
     <>
       <LinearProgress />
-      <div className="w-[95vw] h-[90vh] flex items-center justify-center ">
+      <div className="w-screen h-screen flex items-center justify-center ">
         <div className="font-bold">Getting your data...</div>
       </div>
     </>

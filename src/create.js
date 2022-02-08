@@ -22,6 +22,7 @@ import { MdClose } from "react-icons/md";
 import NavBar from "./navbar";
 import { useLocation, useSearchParams } from "react-router-dom";
 import areObjectsEqual from "./objectsequal";
+import randomColor from "randomcolor";
 
 export default function Create() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,6 +36,15 @@ export default function Create() {
   const planName = urlParams.get("name");
   const [itemLevelCopy, setItemLevelCopy] = useState(newItemLevels);
   const [alert, setAlert] = useState(false);
+  const [colorMap, setColorMap] = useState({});
+
+  useEffect(() => {
+    let o = {};
+    newItemLevels?.forEach((_, i) => (o[i] = randomColor()));
+    setColorMap(o);
+  }, [newItemLevels]);
+
+  useEffect(() => console.log(randomColor()), []);
 
   useEffect(() => {
     if (alert) setAlert(false);
@@ -99,7 +109,11 @@ export default function Create() {
       <>
         <ListItem onClick={() => setIsModalOpen({ edit: idx + 1 })} className="hover:bg-slate-200" alignItems="flex-start">
           <ListItemAvatar>
-            <Avatar alt={String(idx + 1)} src="/static/images/avatar/1.jpg" />
+            <div
+              style={{ backgroundColor: colorMap[idx] || "black" }}
+              className={`rounded-full w-[40px] h-[40px] flex items-center justify-center text-white`}>
+              {String(idx + 1)}
+            </div>
           </ListItemAvatar>
           <ListItemText
             primary={`Level ${idx + 1}`}
@@ -153,30 +167,31 @@ export default function Create() {
           }}
         />
       )}
-      <div className="w-screen ml-[300px] flex justify-center">
-        <div className="flex flex-col w-[90%] items-center rounded-xl bg-gray-300 ">
-          <div className="flex">
-            <div className="font-bold mb-[50px] mt-[10px] ml-[15px]">
+      <div className="w-screen ml-[300px] flex justify-center px-[10px]">
+        <div className="flex flex-col w-[100%] items-center">
+          <div className="flex w-[100%] p-[10px] border-b border-gray-400 items-center justify-between">
+            <div className="font-bold">
               {createOrEdit === "create" ? "Create a new Plan" : "Edit Plan"}
+              <div className="w-[300px]">
+                <input
+                  placeholder={createOrEdit === "create" ? "Plan Name" : planName}
+                  disabled={createOrEdit === "edit"}
+                  ref={planNameRef}
+                  className="form-control"
+                  label="Plan Name"
+                />
+              </div>
             </div>
-          </div>
-          <div className="w-[300px]">
-            <input
-              placeholder={createOrEdit === "create" ? "Plan Name" : planName}
-              disabled={createOrEdit === "edit"}
-              ref={planNameRef}
-              className="form-control"
-              label="Plan Name"
-            />
-          </div>
-          <Box className="flex items-center mt-[30px]">
-            <div className="mr-[20px]">Add new Level</div>
-            <Fab onClick={() => setIsModalOpen(true)} color="secondary" aria-label="add">
-              <FaPlus></FaPlus>
-            </Fab>
-          </Box>
 
-          <Box className="bg-slate-100 mt-[50px] w-[600px] rounded-xl cursor-pointer mb-[20px]">
+            <Box className="flex items-center">
+              <div className="mr-[20px]">Add new Level</div>
+              <Fab onClick={() => setIsModalOpen(true)} color="secondary" aria-label="add">
+                <FaPlus></FaPlus>
+              </Fab>
+            </Box>
+          </div>
+
+          <Box className="mt-[20px] w-[100%] rounded-xl cursor-pointer mb-[20px]">
             <List>
               {newItemLevels?.length > 0 ? (
                 newItemLevels.map((el, idx) => (
